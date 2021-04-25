@@ -24,6 +24,7 @@
 ## Полезные ссылки
 * [Youtube-плейлист с записями встреч](https://www.youtube.com/playlist?list=PLlVmvffm-nlI8F9uiZ62pFyzjLvOkkYLU)
 * [Главная страница leanprover-community](https://leanprover-community.github.io/)
+* [Документация API mathlib](https://leanprover-community.github.io/mathlib_docs/)
 * [Zulip чат, основное место для обсуждений про Lean](https://leanprover.zulipchat.com/#)
 * [Twitter](https://twitter.com/xenaproject) и [блог](https://xenaproject.wordpress.com/) Kevin Buzzard про Lean
 * [Репозиторий tutorials](https://github.com/leanprover-community/tutorials) с упражнениями для начинающих
