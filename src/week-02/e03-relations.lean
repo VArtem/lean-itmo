@@ -1,7 +1,10 @@
 import tactic
 
 /-!
-Упр
+
+Упражнения в этом файле взяты из курса Formalising Mathematics:
+https://github.com/ImperialCollegeLondon/formalising-mathematics/blob/master/src/week_1/Part_D_relations.lean
+
 Рассмотрим тип `α` и бинарные отношения над `α`: `R : α → α → Prop`.
 Для бинарных отношений в Lean определены понятия рефлексивности, симметричности и транзитивности:
 
