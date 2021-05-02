@@ -66,12 +66,14 @@ lemma subset_def : A ⊆ B = ∀ x : X, x ∈ A → x ∈ B := rfl
 lemma subset_refl : A ⊆ A :=
 begin
   -- попробуйте начать сразу с `intro x`, `rw subset_def` делать не обязательно (но пока вы не знакомы с определениями, можно их раскрывать явно)
-  sorry,
+  intros x xA,
+  exact xA,
 end
 
 lemma subset_trans : A ⊆ B → B ⊆ C → A ⊆ C :=
 begin
-  sorry,
+  intros hAB hBC x xA,
+  exact hBC (hAB xA), 
 end
 
 -- Два множества равны, если в них содержатся одинаковые элементы
@@ -82,7 +84,10 @@ lemma set_eq_def : A = B ↔ ∀ x, x ∈ A ↔ x ∈ B := set.ext_iff
 
 lemma subset_antisymm : A ⊆ B → B ⊆ A → A = B :=
 begin
-  sorry,
+  intros hAB hBA,
+  ext, split,
+  { intro xA, exact hAB xA, },
+  { intro xB, exact hBA xB, },
 end
 
 -- term mode, конструируем доказательство не тактиками, а напрямую
@@ -113,6 +118,7 @@ lemma subset_trans'' {X : Type} {A B C : set X} : A ⊆ B → B ⊆ C → A ⊆ 
 lemma union_def : (p ∈ A ∪ B) = (p ∈ A ∨ p ∈ B) := rfl
 lemma inter_def : (p ∈ A ∩ B) = (p ∈ A ∧ p ∈ B) := rfl
 
+
 -- Тактика `rcases` позволяет разбирать структуры на части за одно применение
 -- Если `h : α ∧ β ∧ γ`, то `rcases h with ⟨ha, hb, hc⟩` даст три нужные гипотезы
 -- Если `h : α ∨ β`, то `rcases h with (ha | hb)` даст две цели с `ha : α` в первой и `hb : β` во второй
@@ -142,12 +148,26 @@ end
 
 lemma inter_assoc (A B C : set X) : (A ∩ B) ∩ C = A ∩ (B ∩ C) :=
 begin
-  sorry,
+  ext x, split,
+  { rintro ⟨⟨hA, hB⟩, hC⟩,
+    exact ⟨hA, ⟨hB, hC⟩⟩ },
+  { rintro ⟨hA, ⟨hB, hC⟩⟩,
+    exact ⟨⟨hA, hB⟩, hC⟩},
 end 
 
 lemma union_assoc (A B C : set X) : (A ∪ B) ∪ C = A ∪ (B ∪ C) :=
 begin
-  sorry,
+  ext x, split,
+  { rintro ((hA | hB) | hC),
+    left, exact hA,
+    right, left, exact hB,
+    right, right, exact hC,
+  },
+  { rintro (hA | (hB | hC)),
+    left, left, exact hA,
+    left, right, exact hB,
+    right, exact hC,
+  },
 end
 
 -- Тактика `all_goals {...}` применяет блок ко всем целям
@@ -159,12 +179,22 @@ end
 
 lemma union_eq_of_subset (hAB : A ⊆ B) : A ∪ B = B :=
 begin
-  sorry,
+  ext x, split,
+  { rintro (hA | hB), exact (hAB hA), exact hB },
+  { intro hB, right, exact hB },
 end
 
 lemma inter_eq_iff_subset : A ⊆ B ↔ A ∩ B = A :=
 begin
-  sorry,
+  split,
+  { intro hAB,
+    ext, split,
+    rintro ⟨xA, xB⟩, exact xA,
+    intro xA, exact ⟨xA, hAB xA⟩, },
+  { rintro hInter x xA,
+    rw ← hInter at xA,
+    cases xA with xA xB,
+    exact xB, },
 end
 
 -- `Aᶜ` (A\^c) это дополнение `A`, то есть, `p ∈ Aᶜ = p ∉ A = ¬p ∈ A`
@@ -174,7 +204,10 @@ example : p ∈ Aᶜ = (p ∉ A) := rfl
 
 lemma compl_subset_compl_of_subset (hAB : A ⊆ B) : Bᶜ ⊆ Aᶜ :=
 begin
-  sorry,
+  intros x xBC xA,
+  apply xBC,
+  apply hAB,
+  exact xA,
 end
 
 -- Закон де Моргана
@@ -182,7 +215,9 @@ end
 -- `tauto` решает цели в логике высказываний, `tauto!` работает в классической логике и может использовать закон исключенного третьего
 lemma compl_inter_eq_compl_union_compl : (A ∩ B)ᶜ = Aᶜ ∪ Bᶜ :=
 begin
-  sorry,
+  ext, split,
+  { intro xABc, simp at xABc ⊢, tauto!, },
+  { intro xAcBc, simp at xAcBc ⊢, tauto, },
 end
 
 -- Для объединения/пересечений нескольких множеств есть следующие операторы:
@@ -203,7 +238,7 @@ end
 
 -- 2. `bUnion` (от bounded union) берет объединение только по `i`, лежащим в множестве `I : set ι`
 -- Обратите внимание на нотацию `∃ i ∈ I`, это сокращение от `∃ i (H : i ∈ I)`, то есть, "существует `i` и доказательство `i ∈ I`"
-lemma mem_bUnion {S ι} {x : S} {F : ι → set S} {I : set ι} : (x ∈ ⋃ i ∈ I, F i) ↔ (∃ i ∈ I, x ∈ F i) := 
+lemma mem_bUnion {S ι} {x : S} {F : ι → set S} {I ∀ {S T}, f ⁻¹' S ⊆ f ⁻¹' T → S ⊆ T: set ι} : (x ∈ ⋃ i ∈ I, F i) ↔ (∃ i ∈ I, x ∈ F i) := 
 begin
   exact set.mem_bUnion_iff,
 end
@@ -220,5 +255,15 @@ def supersets {X : Type} (S : set X) : set (set X) := {T | S ⊆ T}
 
 lemma supersets_sInter {S : set X} : ⋂₀ (supersets S) = S :=
 begin
-  sorry,
+  apply subset_antisymm,
+  { intros x hx,
+    rw [set.mem_sInter] at hx,
+    apply hx S,
+    dsimp [supersets],
+    exact subset_refl _,
+  },
+  { apply set.subset_sInter,
+    intros x hx,
+    exact hx,
+   },
 end  
