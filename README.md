@@ -2,7 +2,14 @@
 
 Первая версия спецкурса проходит в апреле-мае 2021 года. Некоторые упражнения заимствованы из курса [Formalising Mathematics](https://github.com/ImperialCollegeLondon/formalising-mathematics) от Kevin Buzzard.
 
-## Встреча №1 (23-04-2021)
+
+## Неделя №2 (30.04.2021)
+
+Четыре файла с упражнениями на множества, функции, отношения и индуктивные типы (на примере деревьев). Скачайте репозиторий с помощью `leanproject get vartem/lean-itmo` и замените `sorry` (кроме тех, что использованы для иллюстрации) на доказательства.
+
+Для документации по тактикам можете обратиться к https://leanprover-community.github.io/mathlib_docs/tactics.html.
+
+## Неделя №1 (23.04.2021)
 
 Мы решали [Natural Number Game](http://wwwf.imperial.ac.uk/~buzzard/xena/natural_number_game/). Если вы застряли, [то можно подсмотреть решения](https://github.com/ImperialCollegeLondon/natural_number_game/blob/master/SOLUTIONS.md).
 
