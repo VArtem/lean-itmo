@@ -406,7 +406,44 @@ end
 -- Решаем уравнения в языках: если [] ∉ A, то L = A * L + B ↔ L = star A * b
 lemma linear_eq_iff {A B : set (list α)} (hnil : [] ∉ A) : L = A * L + B ↔ L = star A * B :=
 begin
-  sorry,
+  split, {
+    intro h,
+    ext w,
+    suffices hn : ∀ (n : ℕ) (w : list α), n = w.length → (w ∈ L ↔ w ∈ star A * B), {
+      refine hn w.length _ rfl,
+    },
+    intro n,
+    induction n using nat.strong_induction_on with n ih,
+    rintro w rfl,
+    split, {
+      rintro wL,
+      rw h at wL,
+      rcases wL with ⟨left, hleft, right, hright, rfl⟩ | wB, {
+        have left_ne_nil : left ≠ [] := λ hln, begin
+          rw hln at hleft,
+          exact hnil hleft,
+        end,
+        replace left_ne_nil := length_pos_of_ne_nil left_ne_nil,
+        
+        rw [length_append] at ih,
+        specialize ih right.length (by linarith) right rfl,
+        rw ih at hright,
+        rcases hright with ⟨mid, hmid, right, hright, rfl⟩,
+        refine ⟨left ++ mid, _, right, hright, (list.append_assoc _ _ _).symm⟩,
+        apply mul_star_subset_star ⟨left, hleft, mid, hmid, rfl⟩,
+      }, {
+        rw [← one_mul B] at wB,
+        apply append_subset_of_subset _ _ wB,
+        { exact one_subset_star },
+        { exact set.subset.refl _ },
+      }
+    }, {
+      rintro ⟨left, hleft, right, hright, rfl⟩,
+      sorry,
+    }
+  }, {
+    sorry,
+  }
 end
 
 end languages
