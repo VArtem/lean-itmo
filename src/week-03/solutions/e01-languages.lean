@@ -25,9 +25,9 @@ def append (L M: set (list α)) :=
 instance : has_mul (set (list α)) := ⟨append⟩
 
 -- И вспомогательные леммы
-@[simp] def zero_def : (0 : set (list α)) = ∅ := rfl
-@[simp] def one_def : (1 : set (list α)) = {[]} := rfl
-@[simp] def mem_zero {w : list α} : w ∉ (0 : set (list α)) := by simp
+def zero_def : (0 : set (list α)) = ∅ := rfl
+def one_def : (1 : set (list α)) = {[]} := rfl
+@[simp] def mem_zero {w : list α} : w ∉ (0 : set (list α)) := by simp [zero_def]
 @[simp] def mem_one {w : list α} : w ∈ (1 : set (list α)) ↔ w = [] := by refl
 @[simp] def nil_mem_one : [] ∈ (1 : set (list α)) := by simp
 
@@ -98,7 +98,7 @@ begin
   },
 end
 
-lemma left_distrib (A B C : set (list α)) : A * (B + C) = A * B + A * C :=
+@[simp] lemma left_distrib (A B C : set (list α)) : A * (B + C) = A * B + A * C :=
 begin
   ext w, split, {
     rintro ⟨left, hleft, right, (hB | hC), rfl⟩,
@@ -111,7 +111,7 @@ begin
   }
 end
 
-lemma right_distrib (A B C : set (list α)) : (A + B) * C = A * C + B * C :=
+@[simp] lemma right_distrib (A B C : set (list α)) : (A + B) * C = A * C + B * C :=
 begin
     ext w, split, {
     rintro ⟨left, (hA | hB), right, hright, rfl⟩,
@@ -163,6 +163,7 @@ begin
       simp only [pow_zero],
   }, {
     rw [pow_succ, pow_succ],
+
     refine append_subset_of_subset hAB ih,
   },
 end
@@ -191,12 +192,12 @@ end
 @[simp] lemma nil_mem_star : [] ∈ star L :=
 begin
   use 0,
-  simp only [set.mem_singleton, one_def, pow_zero],
+  simp only [nil_mem_one, pow_zero],
 end
 
 @[simp] lemma one_subset_star : 1 ⊆ star L :=
 begin    
-  simp,
+  simp [one_def],
 end
 
 @[simp] lemma pow_subset_star (n : ℕ) : L^n ⊆ star L :=
@@ -208,7 +209,8 @@ end
 @[simp] lemma subset_star : L ⊆ star L :=
 begin
   -- сделает `rw` только в левой части
-  conv_lhs {rw ← pow_one L},
+  -- conv_lhs {rw ← pow_one L},
+  nth_rewrite 0 [←pow_one L],
   exact pow_subset_star 1,
 end
 
@@ -277,16 +279,14 @@ end
 #check list.mem
 #check mem_cons_self
 #check list.join
-#check join_eq_nil
+#check join_append
 
 lemma pow_eq_list_join {n : ℕ} : 
     L^n = {w | ∃ (l : list (list α)) (h : ∀ x ∈ l, x ∈ L), w = list.join l ∧ l.length = n} :=
 begin
   apply subset.antisymm, {
     induction n with n ih, {
-      simp,
-      use [[]],
-      simp,
+      simp [one_def], use [[]], simp,
     }, {
       rw pow_succ,
       rintro _ ⟨left, hleft, right, hright, rfl⟩,
@@ -306,7 +306,7 @@ begin
     }
   }, {
     induction n with n ih, {
-      simp,
+      simp [one_def],
       rintro w l h rfl hlen,
       rw [length_eq_zero] at hlen,
       subst hlen,
@@ -380,18 +380,12 @@ begin
       apply append_subset_of_subset (one_subset_star) (subset_star),      
     }
   }, {
-    rw [star_eq_Union, Union_subset_iff],
-    rintro n,
-    induction n with n ih, {
-      simp,
-    }, {
-      rw [pow_succ],
-      apply append_subset_star,
-      apply append_subset_star,
-      { apply star_subset_star, exact subset_union_left _ _, },
-      { apply star_subset_star, exact subset_union_right _ _, },
-      { exact ih, },
-    }
+    rw ← @star_star_eq_star _ (L + M),
+    apply star_subset_star,
+    rw ← @star_append_star_eq_star _ (L + M),
+    apply append_subset_of_subset,
+    { exact star_subset_star (subset_union_left _ _)},
+    { exact star_subset_star (subset_union_right _ _)},
   }
 end
 
@@ -403,6 +397,32 @@ begin
   exact ⟨left, hleft, right, hright, rfl⟩,
 end
 
+lemma one_add_mul_star_eq_star : 1 + L * star L = star L :=
+begin
+  apply subset.antisymm, {
+    apply union_subset, {
+      simp,
+    }, {
+      exact mul_star_subset_star,
+    }
+  }, {
+    rintro w ⟨n, hw⟩,
+    cases n, {
+      left, exact hw,
+    }, {
+      right,
+      rw [pow_succ] at hw,
+      apply append_subset_of_subset (set.subset.refl _) (pow_subset_star n) hw,
+    }
+  }
+end
+
+lemma mul_star_mul_subset_star_mul : L * ((star L) * M) ⊆ (star L) * M := 
+begin
+  rw ← append_assoc,
+  exact append_subset_of_subset (mul_star_subset_star) (set.subset.refl _), 
+end
+
 -- Решаем уравнения в языках: если [] ∉ A, то L = A * L + B ↔ L = star A * b
 lemma linear_eq_iff {A B : set (list α)} (hnil : [] ∉ A) : L = A * L + B ↔ L = star A * B :=
 begin
@@ -412,37 +432,54 @@ begin
     suffices hn : ∀ (n : ℕ) (w : list α), n = w.length → (w ∈ L ↔ w ∈ star A * B), {
       refine hn w.length _ rfl,
     },
+    clear w,
     intro n,
     induction n using nat.strong_induction_on with n ih,
+    dsimp at ih,
     rintro w rfl,
     split, {
-      rintro wL,
+      intro wL,
       rw h at wL,
-      rcases wL with ⟨left, hleft, right, hright, rfl⟩ | wB, {
-        have left_ne_nil : left ≠ [] := λ hln, begin
-          rw hln at hleft,
-          exact hnil hleft,
+      cases wL, {
+        rcases wL with ⟨left, hleft, right, hright, rfl⟩,
+        have right_length : right.length < (left ++ right).length :=
+        begin
+          rw [length_append],
+          have left_neq_nil : left ≠ [] := λ hln, by {subst hln, exact hnil hleft},
+          have left_length_pos : left.length > 0 := length_pos_of_ne_nil left_neq_nil,
+          linarith,
         end,
-        replace left_ne_nil := length_pos_of_ne_nil left_ne_nil,
-        
-        rw [length_append] at ih,
-        specialize ih right.length (by linarith) right rfl,
+        specialize @ih right.length right_length right rfl,
         rw ih at hright,
-        rcases hright with ⟨mid, hmid, right, hright, rfl⟩,
-        refine ⟨left ++ mid, _, right, hright, (list.append_assoc _ _ _).symm⟩,
-        apply mul_star_subset_star ⟨left, hleft, mid, hmid, rfl⟩,
+        apply mul_star_mul_subset_star_mul,
+        exact ⟨left, hleft, right, hright, rfl⟩,
       }, {
-        rw [← one_mul B] at wB,
-        apply append_subset_of_subset _ _ wB,
-        { exact one_subset_star },
-        { exact set.subset.refl _ },
-      }
+        rw ←one_mul B at wL,
+        apply append_subset_of_subset (one_subset_star) (set.subset.refl _) wL,
+      },
     }, {
       rintro ⟨left, hleft, right, hright, rfl⟩,
-      sorry,
+      rw mem_star_iff_list_join at hleft,
+      rcases hleft with ⟨l, hlist, rfl⟩,
+      clear ih,
+      induction l with head tail ih, {
+        simp, rw h, exact or.inr hright,
+      }, {
+        simp, rw h, left,
+        refine ⟨head, _, tail.join ++ right, _, rfl⟩,
+        { apply hlist, exact mem_cons_self head tail},
+        { apply ih, rintro x xtail, apply hlist, exact mem_cons_of_mem head xtail},
+      }
     }
   }, {
-    sorry,
+    rintro rfl,
+    rw ←append_assoc,
+    -- rw ←one_add_mul_star_eq_star,
+    -- nth_rewrite 0 ←one_add_mul_star_eq_star,
+    conv_lhs {rw ←one_add_mul_star_eq_star},
+    simp,
+    -- https://leanprover-community.github.io/mathlib_docs/tactics.html#abel
+    abel,
   }
 end
 

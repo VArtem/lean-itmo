@@ -25,8 +25,8 @@ def append (L M: set (list α)) :=
 instance : has_mul (set (list α)) := ⟨append⟩
 
 -- И вспомогательные леммы
-@[simp] def zero_def : (0 : set (list α)) = ∅ := rfl
-@[simp] def one_def : (1 : set (list α)) = {[]} := rfl
+def zero_def : (0 : set (list α)) = ∅ := rfl
+def one_def : (1 : set (list α)) = {[]} := rfl
 @[simp] def mem_zero {w : list α} : w ∉ (0 : set (list α)) := by simp
 @[simp] def mem_one {w : list α} : w ∈ (1 : set (list α)) ↔ w = [] := by refl
 @[simp] def nil_mem_one : [] ∈ (1 : set (list α)) := by simp
