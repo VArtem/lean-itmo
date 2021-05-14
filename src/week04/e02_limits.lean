@@ -186,7 +186,6 @@ end
 example (a b : ℝ) (h : a * 2 = b + 1) : a + a = 1 + b :=
 begin
   -- convert h,
-  
   convert h using 1, -- если заменить на `using 2` или больше, будет тот же эффект
   { ring },
   { ring }
@@ -196,31 +195,19 @@ end
 lemma is_limit_add_const {a : ℕ → ℝ} {l : ℝ} (c : ℝ) (ha : is_limit a l) :
   is_limit (λ i, a i + c) (l + c) :=
 begin
-  rintro ε εpos,
-  obtain ⟨N, h⟩ := ha ε εpos,
-  use N,
-  dsimp only,
-  ring_nf,
-  exact h,
+  sorry,
 end
 
 lemma is_limit_add_const_iff {a : ℕ → ℝ} {l : ℝ} (c : ℝ) :
   is_limit a l ↔ is_limit (λ i, a i + c) (l + c) :=
 begin
-  split, {
-    refine is_limit_add_const _,
-  }, {
-    intro h,
-    convert is_limit_add_const (-c) h,
-    all_goals {simp only [add_neg_cancel_right]},
-  }
+  sorry,
 end
 
 lemma is_limit_iff_is_limit_sub_eq_zero (a : ℕ → ℝ) (l : ℝ) :
   is_limit a l ↔ is_limit (λ i, a i - l) 0 :=
 begin
-  convert is_limit_add_const_iff (-l),
-  ring,
+  sorry,
 end
 
 /-
@@ -241,17 +228,7 @@ theorem is_limit_add {a b : ℕ → ℝ} {l m : ℝ}
   (h1 : is_limit a l) (h2 : is_limit b m) :
   is_limit (a + b) (l + m) :=
 begin
-  rintro ε εpos,
-  obtain ⟨N₁, h₁⟩ := h1 (ε/2) (by linarith),
-  obtain ⟨N₂, h₂⟩ := h2 (ε/2) (by linarith),
-  use [max N₁ N₂],
-  rintro n hn,
-  specialize h₁ n (le_of_max_le_left hn),
-  specialize h₂ n (le_of_max_le_right hn),
-  calc |(a + b) n - (l + m)| = |a n + b n - (l + m)| : by rw pi.add_apply
-    ... = |(a n - l) + (b n - m)| : by ring_nf
-    ... ≤ |a n - l| + |b n - m| : abs_add _ _
-    ... < ε : by linarith
+  sorry,
 end
 
 -- Также докажем про взаимодействие предела и умножения
@@ -270,23 +247,14 @@ end
 lemma is_limit_mul_const_left {a : ℕ → ℝ} {l c : ℝ} (h : is_limit a l) :
   is_limit (λ n, c * (a n)) (c * l) :=
 begin
-  by_cases hc : c = 0,
-  { subst hc, simp, exact is_limit_const 0,},
-  intros ε εpos,
-  have cpos : |c| > 0 := abs_pos.2 hc,
-  obtain ⟨N, h⟩ := h (ε / |c|) (div_pos εpos cpos),
-  use N,
-  intros n hn,
-  specialize h n hn,
-  dsimp only,
-  rwa [← mul_sub_left_distrib, abs_mul, ← lt_div_iff' cpos],  
+  sorry, 
 end
 
 lemma is_limit_linear (a : ℕ → ℝ) (b : ℕ → ℝ) (α β c d : ℝ) 
     (ha : is_limit a α) (hb : is_limit b β) : 
     is_limit ( λ n, c * (a n) + d * (b n) ) (c * α + d * β) :=
 begin
-  apply is_limit_add (is_limit_mul_const_left ha) (is_limit_mul_const_left hb),
+  sorry,
 end
 
 
@@ -297,23 +265,7 @@ end
 lemma is_limit_mul_eq_zero_of_is_limit_eq_zero {a : ℕ → ℝ} {b : ℕ → ℝ}
   (ha : is_limit a 0) (hb : is_limit b 0) : is_limit (a * b) 0 :=
 begin
-  intros ε εpos,
-  obtain ⟨N₁, h₁⟩ := ha ε εpos,
-  obtain ⟨N₂, h₂⟩ := hb 1 zero_lt_one,
-  use [max N₁ N₂],
-  intros n hn,
-  specialize h₁ n (le_of_max_le_left hn),
-  specialize h₂ n (le_of_max_le_right hn),
-  rw sub_zero at *,
-  rw [pi.mul_apply, abs_mul, ← mul_one ε],
-  exact mul_lt_mul' (le_of_lt h₁) h₂ (abs_nonneg _) εpos,
-  
-  -- Также есть подхаченная тактика `nlinarith`, которая вместе с некоторыми утверждениями
-  -- Про произведения чисел попытается доказать цель
-  -- Если добавить в контекст неотрицательность `abs`, то следующие строки тоже завершат цель
-  -- have nneg₁ := abs_nonneg (a n),
-  -- have nneg₂ := abs_nonneg (a n),
-  -- nlinarith,
+  sorry,
 end
 
 
@@ -327,27 +279,8 @@ theorem is_limit_mul (a : ℕ → ℝ) (b : ℕ → ℝ) (l m : ℝ)
   is_limit (a * b) (l * m) :=
 begin
   suffices : is_limit (λ i, (a i - l) * (b i - m) + (l * (b i - m)) + m * (a i - l)) 0,
-  { rw is_limit_iff_is_limit_sub_eq_zero, 
-    convert this, 
-    ext,
-    rw pi.mul_apply,
-    ring, },
-  convert @is_limit_add _ _ 0 0 _ _,
-  rw zero_add,
-  convert @is_limit_add _ _ 0 0 _ _,
-  rw zero_add,
-  { apply is_limit_mul_eq_zero_of_is_limit_eq_zero,
-    rwa ← is_limit_iff_is_limit_sub_eq_zero,
-    rwa ← is_limit_iff_is_limit_sub_eq_zero,
-  },
-  { simp_rw mul_sub_left_distrib,
-    rw [← is_limit_iff_is_limit_sub_eq_zero],
-    exact is_limit_mul_const_left h2,
-  },
-  { simp_rw mul_sub_left_distrib,
-    rw [← is_limit_iff_is_limit_sub_eq_zero],
-    exact is_limit_mul_const_left h1,
-  },
+  { sorry, },
+  sorry,
 end
 
 
@@ -356,18 +289,7 @@ theorem is_limit_le_of_le (a : ℕ → ℝ) (b : ℕ → ℝ)
   (l : ℝ) (m : ℝ) (hl : is_limit a l) (hm : is_limit b m) 
   (hle : ∀ n, a n ≤ b n) : l ≤ m :=
 begin
-  apply le_of_not_lt,
-  intro hml,
-  set ε := (l - m) / 2 with ε_def,
-  have εpos : ε > 0 := by {rw ε_def, linarith},
-  obtain ⟨N₁, h₁⟩ := hl ε εpos,
-  obtain ⟨N₂, h₂⟩ := hm ε εpos,
-  specialize hle (max N₁ N₂),
-  specialize h₁ (max N₁ N₂) (le_max_left N₁ N₂),
-  specialize h₂ (max N₁ N₂) (le_max_right N₁ N₂),
-  obtain ⟨h₁₁, h₁₂⟩ := (abs_lt.1 h₁),
-  obtain ⟨h₂₁, h₂₂⟩ := (abs_lt.1 h₂),
-  linarith,
+  sorry,
 end
 
 -- Полицейские сэндвичи
@@ -375,22 +297,8 @@ theorem sandwich (a b c : ℕ → ℝ)
   (l : ℝ) (ha : is_limit a l) (hc : is_limit c l) 
   (hab : ∀ n, a n ≤ b n) (hbc : ∀ n, b n ≤ c n) : is_limit b l :=
 begin
-  intros ε εpos,
-  obtain ⟨N₁, h₁⟩ := ha ε εpos,
-  obtain ⟨N₂, h₂⟩ := hc ε εpos,
-  use [max N₁ N₂],
-  intros n hn,
-  specialize hab n,
-  specialize hbc n,
-  specialize h₁ n (le_of_max_le_left hn),
-  specialize h₂ n (le_of_max_le_right hn),
-  rw abs_lt at h₁ h₂ ⊢,
-  cases h₁, cases h₂,
-  split;
-  linarith,
+  sorry,
 end
-
-
 
 -- Определение ограниченной последовательности
 definition is_bounded (a : ℕ → ℝ) := ∃ B, ∀ n, |a n| ≤ B
@@ -400,27 +308,7 @@ lemma tendsto_bounded_mul_zero {a : ℕ → ℝ} {b : ℕ → ℝ}
   (hA : is_bounded a) (hB : is_limit b 0) 
   : is_limit (a*b) 0 :=
 begin
-  intros ε εpos,
-  obtain ⟨B, h₁⟩ := hA,
-  have Bpos : 0 ≤ B := le_trans (abs_nonneg _) (h₁ 0),
-  cases eq_or_lt_of_le Bpos,
-  { subst h,
-    use 0,
-    rintro n -,
-    specialize h₁ n,
-    replace h₁ := le_antisymm h₁ (abs_nonneg _),
-    simpa [h₁, abs_mul] using εpos,
-  },
-  obtain ⟨N, h₂⟩ := hB (ε / B) (div_pos εpos h),  
-  use N,
-  intros n hn,
-  specialize h₁ n,
-  specialize h₂ n hn,
-  rw sub_zero at *,
-  rw [pi.mul_apply, abs_mul],
-  convert ← mul_lt_mul' h₁ h₂ (abs_nonneg _) h,
-  rw [mul_comm],
-  exact div_mul_cancel _ (norm_num.ne_zero_of_pos B h),
+  sorry,
 end
 
 -- Можно продолжить определять новые понятия, и так далее, ...

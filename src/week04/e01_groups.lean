@@ -38,12 +38,7 @@ variables {G : Type} [group G]
 
 lemma mul_left_cancel (a b c : G) (Habac : a * b = a * c) : b = c := 
 begin
-  rw ← one_mul b,
-  rw ← one_mul c,
-  rw ← mul_left_inv a,
-  rw mul_assoc,
-  rw mul_assoc,
-  rw Habac,
+  sorry,
 end
 
 -- Доказательства из длинных цепочек равенств или неравенств часто можно заменить на `calc` (справка по `calc`: https://leanprover-community.github.io/extras/calc.html)
@@ -62,8 +57,7 @@ end
 
 lemma mul_eq_of_eq_inv_mul {a x y : G} (h : x = a⁻¹ * y) : a * x = y :=
 begin
-  apply mul_left_cancel,
-  rwa [← mul_assoc, mul_left_inv, one_mul],
+  sorry,
 end
 
 variables (a b c x y : G)
@@ -74,12 +68,12 @@ variables (a b c x y : G)
 
 @[simp] theorem mul_one : a * 1 = a :=
 begin
-  exact mul_eq_of_eq_inv_mul (mul_left_inv _).symm, 
+  sorry,
 end
 
 @[simp] theorem mul_right_inv : a * a⁻¹ = 1 :=
 begin
-  exact mul_eq_of_eq_inv_mul (mul_one _).symm,
+  sorry,
 end
 
 
@@ -122,28 +116,22 @@ end
 
 @[simp] lemma mul_inv_cancel_left : a * (a⁻¹ * b) = b :=
 begin
-  rw [← mul_assoc],
-  simp,
+  sorry,
 end
 
 @[simp] lemma inv_mul : (a * b)⁻¹ = b⁻¹ * a⁻¹ :=
 begin
-  apply mul_left_cancel (a * b),
-  rw mul_right_inv,
-  simp,
+  sorry,
 end
 
 @[simp] lemma one_inv : (1 : G)⁻¹ = 1 :=
 begin
-  apply mul_left_cancel (1 : G),
-  rw mul_right_inv,
-  simp,
+  sorry,
 end
 
 @[simp] lemma inv_inv : a ⁻¹ ⁻¹ = a :=
 begin
-  apply mul_left_cancel a⁻¹,
-  simp,
+  sorry,
 end
 
 /-
@@ -157,102 +145,60 @@ example : (a * b) * 1⁻¹⁻¹ * b⁻¹ * (a⁻¹ * a⁻¹⁻¹⁻¹) * a = 1 :
 
 lemma eq_mul_inv_of_mul_eq {a b c : G} (h : a * c = b) : a = b * c⁻¹ :=
 begin
-  rw ← h,
-  simp,
+  sorry,
 end
 
 lemma eq_inv_mul_of_mul_eq {a b c : G} (h : b * a = c) : a = b⁻¹ * c :=
 begin
-  rw ← h,
-  simp,
+  sorry,
 end
 
 lemma mul_left_eq_self {a b : G} : a * b = b ↔ a = 1 :=
 begin
-  split, {
-    intro h,
-    replace h := congr_arg (λ x, x * b⁻¹) h,
-    simpa using h,
-  }, {
-    intro h,
-    simp [h],
-  }
+  sorry,
 end
 
 lemma mul_right_eq_self {a b : G} : a * b = a ↔ b = 1 :=
 begin
-  split, {
-    intro h,
-    replace h := congr_arg (λ x, a⁻¹ * x) h,
-    simp at h,
-    exact h,
-  }, {
-    intro h,
-    simp [h],
-  }
+  sorry,
 end
 
 lemma eq_inv_of_mul_eq_one {a b : G} (h : a * b = 1) : a = b⁻¹ :=
 calc  a = a * 1 : by rw mul_one
-    ... = a * (b * b⁻¹) : by rw mul_right_inv
-    ... = (a * b) * b⁻¹ : by rw mul_assoc
-    ... = 1 * b⁻¹ : by rw h
-    ... = b⁻¹   : one_mul _
+    ... = b⁻¹   : by sorry
 
 lemma inv_eq_of_mul_eq_one {a b : G} (h : a * b = 1) : a⁻¹ = b :=
 begin
-  replace h := eq_inv_of_mul_eq_one h,
-  simp [h],
+  sorry,
 end
 
 lemma unique_left_id {e : G} (h : ∀ x : G, e * x = x) : e = 1 :=
 begin
-  have h1 := h 1,
-  simpa using h1,
+  sorry,
 end
 
 lemma unique_right_inv {a b : G} (h : a * b = 1) : b = a⁻¹ :=
 begin
-  apply mul_left_cancel a,
-  simp [h],
+  sorry,
 end
 
 lemma mul_left_cancel_iff (a x y : G) : a * x = a * y ↔ x = y :=
 begin
-  split,
-  { apply mul_left_cancel },
-  { intro hxy,
-    rwa hxy }
+  sorry,
 end
 
--- В режим `calc` можно войти даже вне блока begin-end 
 lemma mul_right_cancel (a x y : G) (Habac : x * a = y * a) : x = y := 
 calc x = x * 1 : by rw mul_one
-  ... = x * (a * a⁻¹) : by rw ← mul_right_inv
-  ... = (x * a) * a⁻¹ : by rw ← mul_assoc
-  ... = (y * a) * a⁻¹ : by rw Habac
-  ... = y * (a * a⁻¹) : by rw mul_assoc
-  ... = y * 1 : by rw mul_right_inv
-  ... = y : by rw mul_one
+  ... = y : by sorry
 
 @[simp] theorem inv_inj_iff {a b : G}: a⁻¹ = b⁻¹ ↔ a = b :=
 begin
-  split, {
-    intro h,
-    rw [← inv_inv a, h, inv_inv],
-  }, {
-    rintro rfl,
-    refl,
-  }
+  sorry,
 end   
 
 theorem inv_eq {a b : G}: a⁻¹ = b ↔ b⁻¹ = a :=
 begin
-  split, 
-  all_goals {
-    rintro rfl,
-    simp only [inv_inv],
-  },
+  sorry,
 end  
 
 end group
