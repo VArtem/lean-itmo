@@ -2,6 +2,16 @@
 
 Первая версия спецкурса проходит в апреле-мае 2021 года. Некоторые упражнения заимствованы из курса [Formalising Mathematics](https://github.com/ImperialCollegeLondon/formalising-mathematics) от Kevin Buzzard.
 
+## Неделя №4 (14.05.2021)
+Упражнения на теорию групп и пределы последовательностей (week_2 и week_3 курса Formalising Mathematics).
+
+### Ресурсы:
+1. [Как пользоваться `calc`](https://leanprover-community.github.io/extras/calc.html)
+2. [Продолжение упражнений на теорию групп](https://github.com/ImperialCollegeLondon/formalising-mathematics/tree/master/src/week_2)
+
+## Неделя №3 (07.05.2021)
+
+Упражнения на формальные языки: конкатенация, замыкание Клини. Обновите репозиторий через `git pull`, чтобы увидеть новые задания.
 
 ## Неделя №2 (30.04.2021)
 
