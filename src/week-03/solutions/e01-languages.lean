@@ -382,7 +382,7 @@ begin
   }, {
     rw ← @star_star_eq_star _ (L + M),
     apply star_subset_star,
-    rw ← @star_append_star_eq_star _ (L + M),
+    conv_rhs { rw ← star_append_star_eq_star},
     apply append_subset_of_subset,
     { exact star_subset_star (subset_union_left _ _)},
     { exact star_subset_star (subset_union_right _ _)},
@@ -400,11 +400,7 @@ end
 lemma one_add_mul_star_eq_star : 1 + L * star L = star L :=
 begin
   apply subset.antisymm, {
-    apply union_subset, {
-      simp,
-    }, {
-      exact mul_star_subset_star,
-    }
+    exact union_subset one_subset_star mul_star_subset_star,
   }, {
     rintro w ⟨n, hw⟩,
     cases n, {
@@ -412,7 +408,7 @@ begin
     }, {
       right,
       rw [pow_succ] at hw,
-      apply append_subset_of_subset (set.subset.refl _) (pow_subset_star n) hw,
+      exact append_subset_of_subset (set.subset.refl _) (pow_subset_star n) hw,
     }
   }
 end
@@ -429,27 +425,26 @@ begin
   split, {
     intro h,
     ext w,
-    suffices hn : ∀ (n : ℕ) (w : list α), n = w.length → (w ∈ L ↔ w ∈ star A * B), {
+    suffices hn : ∀ (n : ℕ), ∀ (w : list α) (hn : n = w.length), (w ∈ L ↔ w ∈ star A * B), {
       refine hn w.length _ rfl,
     },
     clear w,
     intro n,
     induction n using nat.strong_induction_on with n ih,
-    dsimp at ih,
+    dsimp only at ih,
     rintro w rfl,
     split, {
       intro wL,
       rw h at wL,
-      cases wL, {
-        rcases wL with ⟨left, hleft, right, hright, rfl⟩,
+      rcases wL with ⟨left, hleft, right, hright, rfl⟩ | wL, {
         have right_length : right.length < (left ++ right).length :=
         begin
           rw [length_append],
           have left_neq_nil : left ≠ [] := λ hln, by {subst hln, exact hnil hleft},
           have left_length_pos : left.length > 0 := length_pos_of_ne_nil left_neq_nil,
-          linarith,
+          simpa only [lt_add_iff_pos_left] using left_length_pos,
         end,
-        specialize @ih right.length right_length right rfl,
+        specialize ih right.length right_length right rfl,
         rw ih at hright,
         apply mul_star_mul_subset_star_mul,
         exact ⟨left, hleft, right, hright, rfl⟩,
@@ -468,7 +463,7 @@ begin
         simp, rw h, left,
         refine ⟨head, _, tail.join ++ right, _, rfl⟩,
         { apply hlist, exact mem_cons_self head tail},
-        { apply ih, rintro x xtail, apply hlist, exact mem_cons_of_mem head xtail},
+        { apply ih, simp only [mem_cons_iff, forall_eq_or_imp] at hlist, exact hlist.2,},
       }
     }
   }, {
@@ -476,10 +471,10 @@ begin
     rw ←append_assoc,
     -- rw ←one_add_mul_star_eq_star,
     -- nth_rewrite 0 ←one_add_mul_star_eq_star,
-    conv_lhs {rw ←one_add_mul_star_eq_star},
-    simp,
+    conv_lhs {rw [←one_add_mul_star_eq_star, right_distrib, one_append]},
     -- https://leanprover-community.github.io/mathlib_docs/tactics.html#abel
     abel,
+    -- Также сработает ac_refl: https://leanprover-community.github.io/mathlib_docs/tactics.html#ac_refl
   }
 end
 
