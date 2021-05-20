@@ -356,10 +356,9 @@ theorem is_limit_le_of_le (a : ℕ → ℝ) (b : ℕ → ℝ)
   (l : ℝ) (m : ℝ) (hl : is_limit a l) (hm : is_limit b m) 
   (hle : ∀ n, a n ≤ b n) : l ≤ m :=
 begin
-  apply le_of_not_lt,
-  intro hml,
+  by_contra hml,
   set ε := (l - m) / 2 with ε_def,
-  have εpos : ε > 0 := by {rw ε_def, linarith},
+  have εpos : ε > 0 := by linarith,
   obtain ⟨N₁, h₁⟩ := hl ε εpos,
   obtain ⟨N₂, h₂⟩ := hm ε εpos,
   specialize hle (max N₁ N₂),
@@ -400,27 +399,24 @@ lemma tendsto_bounded_mul_zero {a : ℕ → ℝ} {b : ℕ → ℝ}
   (hA : is_bounded a) (hB : is_limit b 0) 
   : is_limit (a*b) 0 :=
 begin
-  intros ε εpos,
-  obtain ⟨B, h₁⟩ := hA,
+  rcases hA with ⟨B, h₁⟩,
   have Bpos : 0 ≤ B := le_trans (abs_nonneg _) (h₁ 0),
-  cases eq_or_lt_of_le Bpos,
-  { subst h,
-    use 0,
-    rintro n -,
-    specialize h₁ n,
-    replace h₁ := le_antisymm h₁ (abs_nonneg _),
-    simpa [h₁, abs_mul] using εpos,
+  rcases eq_or_lt_of_le Bpos with rfl | Bpos,
+  { simp_rw abs_nonpos_iff at h₁,
+    convert is_limit_const 0,
+    ext,
+    simp only [h₁, zero_mul, pi.mul_apply],
   },
-  obtain ⟨N, h₂⟩ := hB (ε / B) (div_pos εpos h),  
+  intros ε εpos,
+  obtain ⟨N, h₂⟩ := hB (ε / B) (div_pos εpos Bpos),  
   use N,
   intros n hn,
   specialize h₁ n,
   specialize h₂ n hn,
-  rw sub_zero at *,
+  rw sub_zero at h₂ ⊢,
   rw [pi.mul_apply, abs_mul],
-  convert ← mul_lt_mul' h₁ h₂ (abs_nonneg _) h,
-  rw [mul_comm],
-  exact div_mul_cancel _ (norm_num.ne_zero_of_pos B h),
+  convert ← mul_lt_mul' h₁ h₂ (abs_nonneg _) Bpos,
+  exact mul_div_cancel' _ (ne_of_gt Bpos),
 end
 
 -- Можно продолжить определять новые понятия, и так далее, ...

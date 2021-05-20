@@ -46,6 +46,7 @@
 * [Twitter](https://twitter.com/xenaproject) и [блог](https://xenaproject.wordpress.com/) Kevin Buzzard про Lean
 * [Репозиторий tutorials](https://github.com/leanprover-community/tutorials) с упражнениями для начинающих
 * Конференция Lean for the Curious Mathematician 2020: [видео лекций](https://www.youtube.com/playlist?list=PLlF-CfQhukNlxexiNJErGJd2dte_J1t1N) и [репозиторий с упражнениями с воркшопов](https://github.com/leanprover-community/lftcm2020)
+* [Конвенции именования функций в mathlib](https://leanprover-community.github.io/contribute/naming.html)
 
 ### Книги
 * [Список учебных ресурсов](https://leanprover-community.github.io/learn.html) на leanprover-community
