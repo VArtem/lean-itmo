@@ -1,8 +1,8 @@
 [package]
 name = "lean-itmo"
 version = "0.1"
-lean_version = "leanprover-community/lean:3.28.0"
+lean_version = "leanprover-community/lean:3.30.0"
 path = "src"
 
 [dependencies]
-mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "d052c5270f47dc9e20fcc3eda97b2f165533f509"}
+mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "d47a6e33d9945ed0fafa600acad70a4b174fbdb6"}
