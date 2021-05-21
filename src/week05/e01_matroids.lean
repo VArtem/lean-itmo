@@ -99,7 +99,8 @@ section base
 
 lemma base_eq_card (hA : m.base A) (hB : m.base B) : A.card = B.card := sorry
 
-lemma ind_subset_base : m.ind A → ∃ B, A ⊆ B ∧ m.base B := λ hA, begin
+lemma ind_subset_base (hA : m.ind A) : ∃ B, A ⊆ B ∧ m.base B := 
+begin
   sorry,
 end
 
@@ -119,7 +120,7 @@ begin
 end
 
 -- Почитайте про тактику `finish`: https://leanprover-community.github.io/mathlib_docs/tactics.html#finish%20/%20clarify%20/%20safe
-theorem base_exchange {A B} : m.base A → m.base B → A ≠ B → ∀ x ∈ A \ B, ∃ b ∈ (B \ A), m.base (insert b (A.erase x)) :=
+theorem base_exchange {A B} : m.base A → m.base B → ∀ x ∈ A \ B, ∃ b ∈ (B \ A), m.base (insert b (A.erase x)) :=
 begin
   sorry,
 end

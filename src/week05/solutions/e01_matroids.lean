@@ -118,7 +118,8 @@ section base
 lemma base_eq_card (hA : m.base A) (hB : m.base B) : A.card = B.card := 
   by {rw [←base_of_univ_iff_base] at *, exact base_of_card_eq hA hB} 
 
-lemma ind_subset_base : m.ind A → ∃ B, A ⊆ B ∧ m.base B := λ hA, begin
+lemma ind_subset_base (hA : m.ind A) : ∃ B, A ⊆ B ∧ m.base B := 
+begin
   obtain ⟨B, hAB, h_base⟩ := exists_base_of_superset_of_ind (subset_univ A) hA,
   rw base_of_univ_iff_base at h_base,
   use [B, hAB, h_base],
@@ -154,9 +155,9 @@ begin
 end
 
 -- Почитайте про тактику `finish`: https://leanprover-community.github.io/mathlib_docs/tactics.html#finish%20/%20clarify%20/%20safe
-theorem base_exchange {A B} : m.base A → m.base B → A ≠ B → ∀ x ∈ A \ B, ∃ b ∈ (B \ A), m.base (insert b (A.erase x)) :=
+theorem base_exchange {A B} : m.base A → m.base B → ∀ x ∈ A \ B, ∃ b ∈ (B \ A), m.base (insert b (A.erase x)) :=
 begin
-  intros Abase Bbase h_neq x xA,
+  intros Abase Bbase x xA,
   rcases m.ind_exchange (A.erase x) B _ Bbase.1 _ with ⟨c, cB, cA, cinsert⟩,
   {
     use c,
